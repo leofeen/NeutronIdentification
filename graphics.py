@@ -25,6 +25,22 @@ for data, label in zip(oys, labels):
         plt.subplot(3, 3, j)
         plt.plot(ox, data)
         j += 1
+        if j == 4:
+            break
+
+for data, label in zip(oys, labels):
+    if label == 0:
+        plt.subplot(3, 3, j)
+        plt.plot(ox, data)
+        j += 1
+        if j == 7:
+            break
+
+for data, label in zip(oys, labels):
+    if label == 1:
+        plt.subplot(3, 3, j)
+        plt.plot(ox, data)
+        j += 1
         if j == 10:
             break
 
