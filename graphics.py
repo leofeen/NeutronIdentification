@@ -1,45 +1,34 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-oys = [] # значения на oy
-labels = []
+from read_files import load_data
 
-with open('data_w_source.txt') as data_file:
-    data = data_file.readlines()
-    for i in range(0, len(data)):
-        oys.append(list(map(float, data[i].split())))
+events = load_data()
 
-with open('class_labels.txt') as data_file:
-    data = data_file.readlines()
-    for i in range(0, len(data)):
-        labels.append(int(data[i]))
-
-
-ox = np.arange(0, 3735, 1)
 
 plt.figure(figsize=(20, 16))
 
 j = 1
-for data, label in zip(oys, labels):
-    if label == 1:
+for event in events:
+    if event.label:
         plt.subplot(3, 3, j)
-        plt.plot(ox, data)
+        plt.plot(event.time_axis, event.intensity_points)
         j += 1
         if j == 4:
             break
 
-for data, label in zip(oys, labels):
-    if label == 0:
+for event in events:
+    if not event.label:
         plt.subplot(3, 3, j)
-        plt.plot(ox, data)
+        plt.plot(event.time_axis, event.intensity_points)
         j += 1
         if j == 7:
             break
 
-for data, label in zip(oys, labels):
-    if label == 1:
+for event in events:
+    if event.label:
         plt.subplot(3, 3, j)
-        plt.plot(ox, data)
+        plt.plot(event.time_axis, event.intensity_points)
         j += 1
         if j == 10:
             break
