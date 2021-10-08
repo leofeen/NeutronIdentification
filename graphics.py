@@ -5,7 +5,6 @@ from read_files import load_data
 
 events = load_data()
 
-
 plt.figure(figsize=(20, 16))
 
 j = 1
