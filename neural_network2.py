@@ -67,21 +67,24 @@ class FirstLayer(Layer):
 
 class OurNeuralNetwork:
 
-    def __init__(self, data):
-        # создать нужное количество слоёв
-        self.layers = [FirstLayer(0, len(data), data)]
-        self.layers.append(Layer(1, 3, self.layers[0]))
-        self.layers.append(Layer(2, 3, self.layers[1]))
-        self.layers.append(Layer(3, 1, self.layers[2]))
+    def __init__(self, num_of_layers, *number_of_neurons_in_layers):
+        """инициализация нейронки, количество слоёв и количество нейронов в каждом слое"""
+        self.layers = [FirstLayer(0, number_of_neurons_in_layers[0], [0] * number_of_neurons_in_layers[0])]
+        for i in range(1, num_of_layers):
+            self.layers.append(Layer(i, number_of_neurons_in_layers[i], self.layers[-1]))
 
         # создание случайных весов, которые потом поменяются
         self.weights = [[]]
         for i in range(1, len(self.layers)):
             self.weights.append(
-                [[random() for _ in range(len(self.layers[i - 1]))] for _ in range(len(self.layers[i]))])
+                [[random() for _ in range(number_of_neurons_in_layers[i - 1])] for _ in
+                 range(number_of_neurons_in_layers[i])])
 
-    # просто функция, которая возвращает ответ
-    def feedforward(self):
+    # просто функция, закидываешь данные, возвращается ответ
+    def feedforward(self, data):
+        if len(self.layers[0]) != len(data):
+            raise Exception("Количество данных должно совпадать с количеством нейронов первого слоя!")
+        self.layers[0] = FirstLayer(0, len(data), data)
         for q in range(len(self.layers)):
             self.layers[q].count_values(self.weights[q])
         return self.layers[-1].neurons[0].value
@@ -178,5 +181,7 @@ for i in range(len(data)):
 output = np.array(O).T
 print(output)"""
 
-network = OurNeuralNetwork([])
-print(network.feedforward())
+"""
+network = OurNeuralNetwork(3, 4, 5, 1)
+print(network.feedforward([1, 2, 3, 4]))
+"""  # пример использования нейронки: в нашем случае количество нейронов последнего слоя должно быть равно 1
