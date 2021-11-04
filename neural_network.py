@@ -123,74 +123,16 @@ class OurNeuralNetwork:
 
                 dL_dypred = -2 * (y_true - y_pred)
 
-                for layer in self.layers[1:]:
-                    dn = learn_rate * dL_dypred
-                    for neuron in layer.neurons:
-                        num_of_lay = neuron.lay_number
-                        dw = dn * deriv_sigmoid(neuron.value)
-                        for num_weight in range(len(neuron.weights)):
-                            neuron.weights[num_weight] -= dw * self.layers[num_of_lay - 1].neurons[num_weight].amount
+                for i in range(1, len(self.layers)):
+                    for now in range(len(self.layers[i])):
+                        for pre in range(len(self.layers[i - 1])):
+                            self.weights[i][now][pre] -= learn_rate * dL_dypred * \
+                                                      self.layers[i - 1].neurons[pre].value * \
+                                                      deriv_sigmoid(self.layers[i].neurons[now].amount)
 
-                """"# --- Подсчет частных производных
-                # --- Наименование: d_L_d_w1 представляет "производная L по w1"
-                dL_dypred = -2 * (y_true - y_pred)
-
-                dypred_dw = []
-                dypred_db = []"""
-
-                """# --- Выполняем обратную связь (нам понадобятся эти значения в дальнейшем)
-                sum_h1 = self.w1 * x[0] + self.w2 * x[1] + self.b1
-                h1 = sigmoid(sum_h1)
-
-                sum_h2 = self.w3 * x[0] + self.w4 * x[1] + self.b2
-                h2 = sigmoid(sum_h2)
-
-                sum_o1 = self.w5 * h1 + self.w6 * h2 + self.b3
-                o1 = sigmoid(sum_o1)
-                y_pred = o1
-
-                # --- Подсчет частных производных
-                # --- Наименование: d_L_d_w1 представляет "частично L / частично w1"
-                d_L_d_ypred = -2 * (y_true - y_pred)
-                
-                # Нейрон o1
-                d_ypred_d_w5 = h1 * deriv_sigmoid(sum_o1)
-                d_ypred_d_w6 = h2 * deriv_sigmoid(sum_o1)
-                d_ypred_d_b3 = deriv_sigmoid(sum_o1)
-
-                d_ypred_d_h1 = self.w5 * deriv_sigmoid(sum_o1)
-                d_ypred_d_h2 = self.w6 * deriv_sigmoid(sum_o1)
-
-                # Нейрон h1
-                d_h1_d_w1 = x[0] * deriv_sigmoid(sum_h1)
-                d_h1_d_w2 = x[1] * deriv_sigmoid(sum_h1)
-                d_h1_d_b1 = deriv_sigmoid(sum_h1)
-
-                # Нейрон h2
-                d_h2_d_w3 = x[0] * deriv_sigmoid(sum_h2)
-                d_h2_d_w4 = x[1] * deriv_sigmoid(sum_h2)
-                d_h2_d_b2 = deriv_sigmoid(sum_h2)
-
-                # --- Обновляем вес и смещения
-                # Нейрон h1
-                self.w1 -= learn_rate * dL_dypred * d_ypred_d_h1 * d_h1_d_w1
-                self.w2 -= learn_rate * dL_dypred * d_ypred_d_h1 * d_h1_d_w2
-                self.b1 -= learn_rate * dL_dypred * d_ypred_d_h1 * d_h1_d_b1
-
-                # Нейрон h2
-                self.w3 -= learn_rate * dL_dypred * d_ypred_d_h2 * d_h2_d_w3
-                self.w4 -= learn_rate * dL_dypred * d_ypred_d_h2 * d_h2_d_w4
-                self.b2 -= learn_rate * dL_dypred * d_ypred_d_h2 * d_h2_d_b2
-
-                # Нейрон o1
-                self.w5 -= learn_rate * dL_dypred * d_ypred_d_w5
-                self.w6 -= learn_rate * dL_dypred * d_ypred_d_w6
-                self.b3 -= learn_rate * dL_dypred * d_ypred_d_b3
-
-            # --- Подсчитываем общую потерю в конце каждой фазы
-            if epoch % 10 == 0:
-                y_preds = np.apply_along_axis(self.feedforward, 1, data)
-                loss = mse_loss(all_y_trues, y_preds)"""
+                """for i in range(len(self.layers)):
+                    for neuron in self.layers[i].neurons:
+                        neuron.bias -= learn_rate * dL_dypred * deriv_sigmoid(neuron.amount)"""
 
 
 """
