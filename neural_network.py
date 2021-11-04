@@ -112,8 +112,8 @@ class OurNeuralNetwork:
 
     # функция пока не переделана!!!
     def train(self, data, right_answers):
-        learn_rate = 0.01
-        epochs = 100  # количество циклов во всём наборе данных
+        learn_rate = 0.1
+        epochs = 1000  # количество циклов во всём наборе данных
 
         for epoch in range(epochs):
 
@@ -127,12 +127,12 @@ class OurNeuralNetwork:
                     for now in range(len(self.layers[i])):
                         for pre in range(len(self.layers[i - 1])):
                             self.weights[i][now][pre] -= learn_rate * dL_dypred * \
-                                                      self.layers[i - 1].neurons[pre].value * \
-                                                      deriv_sigmoid(self.layers[i].neurons[now].amount)
+                                                         self.layers[i - 1].neurons[pre].value * \
+                                                         deriv_sigmoid(self.layers[i].neurons[now].amount)
 
-                """for i in range(len(self.layers)):
+                for i in range(len(self.layers)):
                     for neuron in self.layers[i].neurons:
-                        neuron.bias -= learn_rate * dL_dypred * deriv_sigmoid(neuron.amount)"""
+                        neuron.bias -= learn_rate * dL_dypred * deriv_sigmoid(neuron.amount)
 
 
 """
