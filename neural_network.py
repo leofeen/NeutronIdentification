@@ -20,11 +20,13 @@ def mse_loss(y_true, y_pred):
 
 class Neuron:
     def __init__(self, lay, pos):
-        self.amount = 0
-        self.value = sigmoid(self.amount)
         self.lay_number = lay
         self.number = pos
+
+        self.amount = 0
+        self.value = sigmoid(self.amount)
         self.bias = 0
+
         self.weights = []
 
     def count_value(self, weights, previous_layer):
@@ -37,16 +39,19 @@ class Neuron:
         return self.value
 
 
-class FirstNeuron(Neuron):
+class FirstNeuron:
     def __init__(self, lay, pos, value):
-        self.bias = 0
         self.lay_number = 0
         self.number = pos
+
+        self.bias = 0
         self.amount = value + self.bias
         self.value = sigmoid(self.amount)
+
         self.weights = []
 
-    def count_value(self, weights, previous_layer):
+    def count_value(self):
+        self.value = sigmoid(self.amount)
         return self.value
 
 
@@ -62,30 +67,57 @@ class Layer:
         return len(self.neurons)
 
 
-class FirstLayer(Layer):
-    def __init__(self, number_of_layer, number_of_neurons, data):
-        self.neurons = [FirstNeuron(0, q, data[q]) for q in range(number_of_neurons)]
+class FirstLayer:
+    def __init__(self, number_of_layer, number_of_neurons):
+        self.neurons = [FirstNeuron(0, q, 0) for q in range(number_of_neurons)]
+
+    def set_data(self, data):
+        if len(self.neurons) != len(data):
+            raise Exception("Количество данных должно совпадать с количеством нейронов первого слоя!")
+        for i in range(len(data)):
+            self.neurons[i].amount = data[i]
+            self.neurons[i].count_value()
 
     def count_values(self, weights, previous_layer):
         pass
+
+    def __len__(self):
+        return len(self.neurons)
 
 
 class OurNeuralNetwork:
 
     def __init__(self, num_of_layers, *number_of_neurons_in_layers):
         """инициализация нейронки, количество слоёв и количество нейронов в каждом слое"""
-        self.layers = [FirstLayer(0, number_of_neurons_in_layers[0], [0] * number_of_neurons_in_layers[0])]
+        self.layers = [FirstLayer(0, number_of_neurons_in_layers[0])]
         for i in range(1, num_of_layers):
             self.layers.append(Layer(i, number_of_neurons_in_layers[i]))
 
         self.weights = []
-        with open("weights.txt") as f:
-            data = f.read().split("__\n")[:-1]
-            for layer_weights in data:
-                layer_weights = layer_weights.split('\n')[:-1]
-                for j in range(len(layer_weights)):
-                    layer_weights[j] = list(map(float, layer_weights[j].split()))
-                self.weights.append(layer_weights)
+        try:
+            with open("weights.txt") as f:
+                data = f.read().split("__\n")[:-1]
+                for layer_weights in data:
+                    layer_weights = layer_weights.split('\n')[:-1]
+                    for j in range(len(layer_weights)):
+                        layer_weights[j] = list(map(float, layer_weights[j].split()))
+                    self.weights.append(layer_weights)
+
+        except BaseException:
+            self.create_new_weights()
+
+        try:
+            with open("biases.txt") as f:
+                data = f.read().split("\n")
+                if len(data) > 1:
+                    for i in range(len(data)):
+                        data[i] = list(map(float, data[i].split()))
+                    for i in range(len(self.layers)):
+                        for j in range(len(self.layers[i].neurons)):
+                            self.layers[i].neurons[j].bias = data[i][j]
+
+        except BaseException:
+            self.create_new_biases()
 
     def create_new_weights(self):
         self.weights = [[]]
@@ -94,11 +126,14 @@ class OurNeuralNetwork:
                 [[random() for _ in range(len(self.layers[i - 1]))] for _ in
                  range(len(self.layers[i]))])
 
+    def create_new_biases(self):
+        for i in range(len(self.layers)):
+            for j in range(len(self.layers[i].neurons)):
+                self.layers[i].neurons[j].bias = random()
+
     # просто функция, закидываешь данные, возвращается ответ
     def feedforward(self, data):
-        if len(self.layers[0]) != len(data):
-            raise Exception("Количество данных должно совпадать с количеством нейронов первого слоя!")
-        self.layers[0] = FirstLayer(0, len(data), data)
+        self.layers[0].set_data(data)
         for q in range(1, len(self.layers)):
             self.layers[q].count_values(self.weights[q], self.layers[q - 1])
         return self.layers[-1].neurons[0].value
@@ -110,10 +145,9 @@ class OurNeuralNetwork:
                 tmp.append(j.value)
         return tmp
 
-    # функция пока не переделана!!!
     def train(self, data, right_answers):
         learn_rate = 0.1
-        epochs = 1000  # количество циклов во всём наборе данных
+        epochs = 1000  # количество эпох обучения
 
         for epoch in range(epochs):
 
@@ -138,4 +172,4 @@ class OurNeuralNetwork:
 """
 network = OurNeuralNetwork(3, 4, 5, 1)
 print(network.feedforward([1, 2, 3, 4]))
-"""  # пример использования нейронки: в нашем случае количество нейронов последнего слоя должно быть равно 1
+"""  # пример использования нейронки: в нашем случае в последнем слое должен быть 1 нейрон

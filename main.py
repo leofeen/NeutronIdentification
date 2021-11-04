@@ -5,15 +5,13 @@ from neural_network import OurNeuralNetwork
 data = inputdata.get_data()
 answers = inputdata.get_answers()"""
 
-data = [[-2, -1], [25, 6], [17, 4], [-15, -6]]
+data = [[-20, -10], [5, 6], [1, 1], [-1, -1]]
 answers = [0, 1, 1, 0]
 
 # создание нейронки
 network = OurNeuralNetwork(3, 2, 2, 1)
 
-# при самом первом запуске нейронки создать файл weights.txt и запустить эту строку
-# network.create_new_weights()
-
+# процесс тренировки (при дате без ответов закомментить)
 network.train(data, answers)
 
 with open("weights.txt", "w") as f:
@@ -21,6 +19,13 @@ with open("weights.txt", "w") as f:
         for j in i:
             f.write(" ".join(map(str, j)) + "\n")
         f.write("__\n")
+
+with open("biases.txt", "w") as f:
+    for i in network.layers:
+        s = []
+        for j in i.neurons:
+            s.append(j.bias)
+        f.write(" ".join(map(str, s)) + "\n")
 
 for i in data:
     print(network.feedforward(i))
