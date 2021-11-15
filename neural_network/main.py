@@ -47,7 +47,7 @@ def practic():
             prac_anss.append(round(tmp))
 
         except Exception:
-            print(i)
+            print(f"Возникла непредвиденная ошибка при работе со строкой {i}")
 
     pers = 0
     lie1 = 0
